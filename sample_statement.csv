@@ -1,0 +1,6 @@
+date,description,amount,account,payment_method,category
+2026-01-02,Salary Deposit,50000,Checking,Bank Transfer,Salary
+2026-01-03,Groceries,2500,Checking,Card,Grocery
+2026-01-05,Movie Ticket,800,Checking,UPI,Entertainment
+2026-01-07,Electricity Bill,1800,Checking,UPI,Bills
+2026-01-10,Petrol,900,Checking,Card,Fuel

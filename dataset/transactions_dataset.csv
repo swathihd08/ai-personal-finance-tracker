@@ -1,0 +1,29 @@
+description,category
+coffee at cafe,Food
+dinner at restaurant,Food
+groceries for week,Grocery
+milk eggs bread,Grocery
+samsung earbuds,Shopping
+new shoes,Shopping
+petrol refill,Fuel
+diesel tank,Fuel
+movie night,Entertainment
+concert tickets,Entertainment
+doctor appointment,Medical
+medicine purchase,Medical
+flight booking,Travel
+train tickets,Travel
+electricity bill,Bills
+internet bill,Bills
+college tuition,Education
+course subscription,Education
+monthly salary,Salary
+freelance payment,Salary
+mutual fund investment,Investment
+stock purchase,Investment
+emi payment,EMI
+loan installment,EMI
+rent payment,Rent
+apartment rent,Rent
+miscellaneous expense,Others
+parking charges,Others
