@@ -193,11 +193,19 @@ def export_transactions_pdf(df: pd.DataFrame) -> bytes:
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
-    pdf.set_font("Arial", size=12)
+    pdf.set_font("Courier", size=10)
     pdf.cell(200, 10, txt="AI Personal Finance Tracker - Summary", ln=True, align="C")
     pdf.ln(5)
     for _, row in df.head(10).iterrows():
-        pdf.multi_cell(190, 6, txt=f"{row['date']} | {row['description']} | ₹{row['amount']} | {row['category']}")
+        # Convert to string and remove problematic Unicode characters
+        date_str = str(row['date'])
+        desc_str = str(row['description']).replace('₹', 'Rs.').replace('€', 'E').replace('£', 'L')
+        amount_str = str(row['amount'])
+        cat_str = str(row['category'])
+        # Use latin-1 encoding for PDF compatibility
+        txt = f"{date_str} | {desc_str} | Rs.{amount_str} | {cat_str}"
+        txt = txt.encode('latin-1', errors='replace').decode('latin-1')
+        pdf.multi_cell(190, 6, txt=txt)
     buffer = io.BytesIO()
     pdf.output(buffer)
     return buffer.getvalue()
