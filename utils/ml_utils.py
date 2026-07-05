@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import joblib
+import numpy as np
 import pandas as pd
 from pathlib import Path
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -71,7 +72,8 @@ def _train_models() -> dict:
             "precision": precision_score(y_test, predictions, average="weighted", zero_division=0),
             "recall": recall_score(y_test, predictions, average="weighted", zero_division=0),
             "f1": f1_score(y_test, predictions, average="weighted", zero_division=0),
-            "confusion_matrix": confusion_matrix(y_test, predictions).tolist(),
+            # Build a full confusion matrix that includes all label encoder classes
+            "confusion_matrix": confusion_matrix(y_test, predictions, labels=np.arange(len(label_encoder.classes_))).tolist(),
             "labels": label_encoder.classes_.tolist(),
         }
 
@@ -119,6 +121,6 @@ def get_model_metrics() -> dict:
         "precision": precision_score(y_test, predictions, average="weighted", zero_division=0),
         "recall": recall_score(y_test, predictions, average="weighted", zero_division=0),
         "f1": f1_score(y_test, predictions, average="weighted", zero_division=0),
-        "confusion_matrix": confusion_matrix(y_test, predictions).tolist(),
+        "confusion_matrix": confusion_matrix(y_test, predictions, labels=np.arange(len(label_encoder.classes_))).tolist(),
         "labels": label_encoder.classes_.tolist(),
     }
