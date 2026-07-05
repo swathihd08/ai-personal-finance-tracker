@@ -107,7 +107,11 @@ def get_model_metrics() -> dict:
     df = df.dropna(subset=["description", "category"])
     df["description"] = df["description"].apply(clean_text)
     y = label_encoder.transform(df["category"])
-    X_train, X_test, y_train, y_test = train_test_split(df["description"], y, test_size=0.2, random_state=42, stratify=y)
+    # Use stratify only when safe for the dataset size
+    stratify = y if _should_stratify(pd.Series(y), test_size=0.2) else None
+    X_train, X_test, y_train, y_test = train_test_split(
+        df["description"], y, test_size=0.2, random_state=42, stratify=stratify
+    )
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
     return {
