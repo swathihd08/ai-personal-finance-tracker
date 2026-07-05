@@ -2,6 +2,14 @@ import hashlib
 import json
 from pathlib import Path
 
+try:
+    from utils.cloud_db import save_user_cloud, load_user_cloud, check_cloud_enabled
+    CLOUD_ENABLED = check_cloud_enabled()
+except ImportError:
+    CLOUD_ENABLED = False
+    save_user_cloud = None
+    load_user_cloud = None
+
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT_DIR / "data"
@@ -31,14 +39,30 @@ def verify_password(password: str, stored_hash: str) -> bool:
 
 def load_user_store() -> dict:
     ensure_storage()
+    # Try cloud storage first
+    if CLOUD_ENABLED and load_user_cloud:
+        try:
+            cloud_data = load_user_cloud("_store")
+            if cloud_data:
+                return cloud_data
+        except Exception:
+            pass
+    # Fallback to local storage
     with USER_DB_PATH.open("r", encoding="utf-8") as handle:
         return json.load(handle)
 
 
 def save_user_store(store: dict) -> None:
     ensure_storage()
+    # Save to local storage
     with USER_DB_PATH.open("w", encoding="utf-8") as handle:
         json.dump(store, handle, indent=2)
+    # Also try to save to cloud
+    if CLOUD_ENABLED and save_user_cloud:
+        try:
+            save_user_cloud("_store", store)
+        except Exception:
+            pass  # Cloud save failed, but local save succeeded
 
 
 def create_user(username: str, password: str, full_name: str = "") -> bool:
