@@ -26,13 +26,25 @@ def clean_text(text: str) -> str:
     return cleaned
 
 
+def _should_stratify(y: pd.Series, test_size: float) -> bool:
+    counts = y.value_counts()
+    if counts.min() < 2:
+        return False
+    n_samples = len(y)
+    n_classes = counts.size
+    return test_size * n_samples >= n_classes and (1 - test_size) * n_samples >= n_classes
+
+
 def _train_models() -> dict:
     df = pd.read_csv(DATASET_PATH)
     df = df.dropna(subset=["description", "category"])
     df["description"] = df["description"].apply(clean_text)
     label_encoder = LabelEncoder()
     y = label_encoder.fit_transform(df["category"])
-    X_train, X_test, y_train, y_test = train_test_split(df["description"], y, test_size=0.2, random_state=42, stratify=y)
+    stratify = y if _should_stratify(pd.Series(y), test_size=0.2) else None
+    X_train, X_test, y_train, y_test = train_test_split(
+        df["description"], y, test_size=0.2, random_state=42, stratify=stratify
+    )
 
     models = {
         "Logistic Regression": Pipeline([
