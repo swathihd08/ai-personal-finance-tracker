@@ -15,8 +15,18 @@ def get_supabase_client():
         
         if not url or not key:
             return None
-            
-        return create_client(url, key)
+
+        # Basic validation of URL
+        if not (url.startswith("http://") or url.startswith("https://")):
+            # avoid attempting DNS lookup on malformed URL
+            st.warning("SUPABASE_URL in secrets looks invalid (missing http/https). Cloud storage will be disabled until secrets are corrected.")
+            return None
+
+        try:
+            return create_client(url, key)
+        except Exception as e:
+            # Return None so the app falls back to local storage; caller will display a friendly message
+            return None
     except Exception:
         return None
 
@@ -49,7 +59,12 @@ def save_user_cloud(username: str, user_data: dict) -> bool:
         }).execute()
         return True
     except Exception as e:
-        st.warning(f"Cloud save failed, using local storage: {e}")
+        msg = str(e)
+        # Provide clearer guidance for common DNS/network errors
+        if "Name or service not known" in msg or "Errno -2" in msg or "gaierror" in msg:
+            st.warning("Cloud save failed: DNS lookup failed for SUPABASE_URL. Please check SUPABASE_URL in Streamlit Secrets and ensure the Supabase project URL is correct.")
+        else:
+            st.warning(f"Cloud save failed, using local storage: {msg}")
         return False
 
 
